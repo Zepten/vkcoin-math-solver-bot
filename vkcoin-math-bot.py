@@ -31,11 +31,16 @@ def mouse_click(pos: tuple):
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
 
 
+def is_captcha_on_screen():
+    # TODO: Pixel Matching
+    return pyautogui.locateOnScreen('captcha.png', region=CAPTCHA_REGION, grayscale=True, confidence=0.8) is not None
+
+
 def input_captcha():
     print('Waitng for captcha...')
     captcha = pyautogui.prompt(title='Captcha')
     if captcha:
-        mouse_click(CAPTCHA_INPUT_FIELD_POS)
+        mouse_click(CAPTCHA_INPUT_POS)
         pyautogui.hotkey('ctrl', 'a')
         pyautogui.press('backspace')
         pyautogui.write(captcha)
@@ -43,7 +48,7 @@ def input_captcha():
 
 
 def click(pos: tuple):
-    while pyautogui.locateOnScreen('captcha.png'):
+    while is_captcha_on_screen():
         input_captcha()
         time.sleep(0.5)
     mouse_click(pos)
@@ -65,7 +70,7 @@ def bot_handler():
         print('>----- Start -----<')
         click(get_level_pos(level))
         time.sleep(1)
-        image = pyautogui.screenshot(region=(1039, 580, 352, 132))
+        image = pyautogui.screenshot(region=EXPRESSION_REGION)
         image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
         print(f'Screenshot taken.')
         expression = replace_all(str(pytesseract.image_to_string(image, lang='eng', config=TESSERACT_CONFIG)).strip(), REPLACEMENTS)
@@ -73,7 +78,7 @@ def bot_handler():
         try:
             result = str(int(numexpr.evaluate(expression)))
             print(f'Result: {result}')
-            click(INPUT_FIELD_POS)
+            click(INPUT_POS)
             pyautogui.hotkey('ctrl', 'a')
             pyautogui.press('backspace')
             pyautogui.write(result)
