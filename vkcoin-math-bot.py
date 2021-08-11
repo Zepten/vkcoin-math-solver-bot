@@ -24,12 +24,29 @@ def get_level_pos(level: int):
     )
 
 
-def click(pos: tuple):
+def mouse_click(pos: tuple):
     win32api.SetCursorPos(pos)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
     time.sleep(0.1)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
-    print(f'Left click at {pos}')
+
+
+def input_captcha():
+    print('Waitng for captcha...')
+    captcha = pyautogui.prompt(title='Captcha')
+    if captcha:
+        mouse_click(CAPTCHA_INPUT_FIELD_POS)
+        pyautogui.hotkey('ctrl', 'a')
+        pyautogui.press('backspace')
+        pyautogui.write(captcha)
+        pyautogui.press('enter')
+
+
+def click(pos: tuple):
+    while pyautogui.locateOnScreen('captcha.png'):
+        input_captcha()
+        time.sleep(0.5)
+    mouse_click(pos)
 
 
 def exit_handler():
@@ -43,19 +60,8 @@ def exit_handler():
 def bot_handler():
     click(FOCUS_POS)
     click(PLAY_POS)
-    time.sleep(1)
+    time.sleep(0.5)
     while pause.wait():
-        if pyautogui.locateOnScreen('captcha.png'):
-            print('Waitng for captcha...')
-            captcha = pyautogui.prompt('Captcha')
-            if captcha:
-                click(CAPTCHA_INPUT_FIELD_POS)
-                pyautogui.hotkey('ctrl', 'a')
-                pyautogui.press('backspace')
-                pyautogui.write(captcha)
-                click(CAPTCHA_SEND_POS)
-                time.sleep(2)
-            continue
         print('>----- Start -----<')
         click(get_level_pos(level))
         time.sleep(1)
@@ -75,12 +81,12 @@ def bot_handler():
             pyautogui.press('backspace')
             pyautogui.write(result)
             pyautogui.press('enter')
-            time.sleep(1)
-        except SyntaxError:
+            time.sleep(0.5)
+        except (SyntaxError, KeyError):
             click(BACK_POS)
-            time.sleep(1)
+            time.sleep(0.5)
             click(PLAY_POS)
-            time.sleep(1)
+            time.sleep(0.5)
 
 
 def main():
