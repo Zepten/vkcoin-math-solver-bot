@@ -1,8 +1,6 @@
 TESSERACT_PATH  = 'D:\\Tesseract-OCR\\tesseract.exe'
 TESSERACT_CONFIG = r'-c tessedit_char_whitelist=01234567890()*+-/=? --psm 6'
 
-KEEP_TEMP_FILES = True # Нужно ли сохранять временные скриншоты
-
 PLAY_POS        = (1105, 858) # Кнопка "Играть"
 FOCUS_POS       = (1800, 500) # Пустое пространство для фокуса на окне
 INPUT_FIELD_POS = (1037, 910) # Поле ввода "Напишите сообщение..."

@@ -1,6 +1,6 @@
-from datetime import datetime
 import win32api, win32con
 from config import *
+import numpy as np
 import pytesseract
 import threading
 import pyautogui
@@ -65,13 +65,10 @@ def bot_handler():
         print('>----- Start -----<')
         click(get_level_pos(level))
         time.sleep(1)
-        filename = f'temp/{datetime.timestamp(datetime.now())}.png'
-        pyautogui.screenshot(filename, region=(1039, 580, 352, 132))
-        print(f'Screenshot "{filename}" taken')
-        img = cv2.imread(filename)
-        expression = replace_all(str(pytesseract.image_to_string(img, lang='eng', config=TESSERACT_CONFIG)).strip(), REPLACEMENTS)
-        if not KEEP_TEMP_FILES:
-            os.remove(filename)
+        image = pyautogui.screenshot(region=(1039, 580, 352, 132))
+        image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+        print(f'Screenshot taken.')
+        expression = replace_all(str(pytesseract.image_to_string(image, lang='eng', config=TESSERACT_CONFIG)).strip(), REPLACEMENTS)
         print(f'Expression: {expression}')
         try:
             result = str(int(numexpr.evaluate(expression)))
